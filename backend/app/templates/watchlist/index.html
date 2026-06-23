@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Watchlist - Stock Portfolio System{% endblock %}
+{% block topbar_title %}Watchlist{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">My Watchlist</h4>
+
+    <p class="text-muted small mb-0">Track stocks you're interested in without buying them.</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWatchModal">
+    <i class="bi bi-plus-lg me-1"></i>Add Stock
+  </button>
+</div>
+
+
+<!-- Watchlist Stats -->
+<div class="row g-3 mb-4">
+
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Stocks Watching</div>
+      <div class="stat-value">{{ items|length }}</div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Average Price</div>
+      <div class="stat-value">
+        ₹{{ "%.2f"|format(
+        (items|sum(attribute='last_price') / items|length)
+        if items|length > 0 else 0
+        ) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Stocks Tracked</div>
+      <div class="stat-value">{{ items|length }}</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-portfolio mb-0">
+        <thead>
+          <tr>
+            <th>Stock</th>
+            <th>Sector</th>
+            <th class="text-end">Current Price</th>
+            <th>Added On</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>
+              <span class="ticker-badge">{{ item.ticker_symbol }}</span>
+              <div class="small text-muted">{{ item.company_name }}</div>
+            </td>
+            <td><span class="badge badge-sector">{{ item.sector_name or 'N/A' }}</span></td>
+            <td class="text-end">₹{{ "%.2f"|format(item.last_price) }}</td>
+            <td class="small text-muted">{{ item.added_at.strftime('%d %b %Y') }}</td>
+            <td class="text-center">
+              <a href="{{ url_for('analysis.stock_detail', stock_id=item.stock_id) }}"
+                class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-bar-chart"></i> View
+              </a>
+              <button class="btn btn-sm btn-outline-success"
+                onclick="openTradeModal({{ item.stock_id }}, '{{ item.ticker_symbol }}', {{ item.last_price }}, 'buy')">
+                Buy
+              </button>
+              <form method="POST" action="{{ url_for('watchlist.remove', stock_id=item.stock_id) }}" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">
+              Your watchlist is empty. Click <strong>Add Stock</strong> to start tracking stocks.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add to Watchlist Modal -->
+<div class="modal fade" id="addWatchModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Stock to Watchlist</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('watchlist.add') }}">
+        <div class="modal-body">
+          <label class="form-label">Select Stock</label>
+          <select name="stock_id" class="form-select" required>
+            <option value="" disabled selected>Choose a stock...</option>
+            {% for s in all_stocks %}
+            <option value="{{ s.stock_id }}">{{ s.ticker_symbol }} — {{ s.company_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add to Watchlist</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% include 'partials/trade_modal.html' %}
+{% endblock %}

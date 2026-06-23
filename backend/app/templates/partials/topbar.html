@@ -1,0 +1,41 @@
+<div class="topbar">
+  <div class="d-flex align-items-center gap-2">
+    <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggle">
+      <i class="bi bi-list"></i>
+    </button>
+    <span class="fw-semibold">{% block topbar_title %}{% endblock %}</span>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    {% if session.get('role') != 'admin' %}
+
+    <span class="badge bg-success market-status">
+      ● Market Open
+    </span>
+
+    <span class="small text-muted d-none d-md-inline">
+      <i class="bi bi-wallet2"></i>
+      Virtual Cash: ₹{{ "%.2f"|format(g_virtual_balance) if g_virtual_balance is defined else "—" }}
+    </span>
+
+    {% endif %}
+    <div class="dropdown">
+      <a class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" href="#" role="button"
+        data-bs-toggle="dropdown">
+        <span class="bg-secondary bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center"
+          style="width:34px;height:34px;">
+          <i class="bi bi-person-fill"></i>
+        </span>
+        <span class="ms-2 small fw-semibold d-none d-sm-inline">{{ session.get('full_name', 'User') }}</span>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><span class="dropdown-item-text small text-muted">Signed in as <strong>{{ session.get('username')
+              }}</strong></span></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i
+              class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

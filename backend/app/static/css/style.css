@@ -1,0 +1,706 @@
+/* ============================================================================
+   Stock Market Portfolio & Analysis System - Custom Styles
+   Built on top of Bootstrap 5. This file only contains overrides and
+   custom components that Bootstrap doesn't provide out of the box.
+   ============================================================================ */
+
+:root {
+  --brand-navy: #0b1f3a;
+  --brand-navy-light: #132b4d;
+  --brand-teal: #0d9488;
+  --brand-teal-dark: #0f766e;
+  --brand-gold: #c9a227;
+  --gain-green: #16a34a;
+  --loss-red: #dc2626;
+  --bg-soft: #f4f6f9;
+  --border-soft: #e2e8f0;
+}
+
+body {
+  background-color: var(--bg-soft);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  color: #1e2733;
+}
+
+/* ---------------- Layout shell ---------------- */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: linear-gradient(180deg, var(--brand-navy) 0%, var(--brand-navy-light) 100%);
+  color: #cdd7e6;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar .brand {
+  padding: 1.25rem 1.25rem 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar .brand .ticker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-teal);
+  display: inline-block;
+}
+
+.sidebar .nav-link {
+  color: #aab8cc;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.92rem;
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(59,130,246,0.12) !important;
+
+    transform: translateX(6px);
+
+    color: white !important;
+
+    transition: all 0.25s ease;
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6
+    ) !important;
+
+    color: white !important;
+
+    border-left: 4px solid #38bdf8;
+
+    box-shadow:
+        0 0 25px rgba(59,130,246,0.35);
+
+    transform: translateX(3px);
+}
+
+.sidebar .nav-link i {
+  width: 20px;
+  text-align: center;
+  margin-right: 0.6rem;
+}
+
+.sidebar .nav-section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7d99;
+  padding: 1rem 1.25rem 0.4rem;
+}
+
+.main-content {
+  margin-left: 250px;
+  min-width: 0;
+}
+
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-body {
+  padding: 1.5rem;
+}
+
+/* ---------------- Cards & stat tiles ---------------- */
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+  padding: 1.1rem 1.3rem;
+  height: 100%;
+  transition: box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.stat-card .stat-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 0.35rem;
+}
+
+.stat-card .stat-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stat-card .stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.text-gain { color: var(--gain-green) !important; }
+.text-loss { color: var(--loss-red) !important; }
+.bg-gain-soft { background-color: rgba(22,163,74,0.1) !important; }
+.bg-loss-soft { background-color: rgba(220,38,38,0.1) !important; }
+
+/* ---------------- Cards ---------------- */
+.card {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.6rem;
+}
+
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid var(--border-soft);
+  font-weight: 600;
+}
+
+/* ---------------- Tables ---------------- */
+.table-portfolio thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  border-bottom-width: 1px;
+  white-space: nowrap;
+}
+
+.table-portfolio td {
+  vertical-align: middle;
+}
+
+.ticker-badge {
+  font-weight: 700;
+  font-family: "Consolas", "Courier New", monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------- Auth pages ---------------- */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-navy) 0%, #1c3a5e 60%, var(--brand-teal-dark) 100%);
+  padding: 1.5rem;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  max-width: 440px;
+  width: 100%;
+  padding: 2.25rem 2rem;
+}
+
+.auth-card .auth-logo {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--brand-navy);
+  margin-bottom: 0.25rem;
+}
+
+/* ---------------- Misc ---------------- */
+.badge-sector {
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 500;
+}
+
+.search-result-item {
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.search-result-item:hover {
+  background: #f8fafc;
+}
+
+.chart-period-btn.active {
+  background: var(--brand-teal) !important;
+  color: #fff !important;
+  border-color: var(--brand-teal) !important;
+}
+
+.login-credentials-hint {
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  color: #475569;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    position: fixed;
+    left: -250px;
+    z-index: 1050;
+    transition: left 0.2s ease;
+  }
+  .sidebar.show {
+    left: 0;
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1040;
+  }
+  .sidebar-backdrop.show {
+    display: block;
+  }
+}
+
+.page-body {
+    padding: 20px;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* =====================================
+   MODERN DARK THEME OVERRIDE
+===================================== */
+
+:root {
+  --bg-dark: #0f172a;
+  --card-dark: #1e293b;
+  --card-border: #334155;
+  --text-light: #e2e8f0;
+  --text-muted: #94a3b8;
+}
+
+/* Main Background */
+body {
+    background:
+    radial-gradient(circle at top left, rgba(59,130,246,0.25), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(20,184,166,0.20), transparent 40%)
+    var(--bg-dark) !important;
+
+    color: var(--text-light) !important;
+}
+
+/* Content Area */
+.main-content,
+.page-body {
+    background:
+    radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(20,184,166,0.08), transparent 30%),
+    var(--bg-dark) !important;
+}
+
+/* Top Navigation */
+.topbar {
+    background: rgba(17,24,39,0.75) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Cards */
+.card,
+.stat-card {
+  background: var(--card-dark) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-light) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* Card Headers */
+.card-header {
+  background: var(--card-dark) !important;
+  color: white !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+/* KPI Values */
+.stat-card .stat-value {
+    color: white !important;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.stat-card .stat-label {
+  color: #94a3b8 !important;
+}
+
+/* Tables */
+.table,
+table {
+  color: var(--text-light) !important;
+}
+
+.table th{
+    color: #e2e8f0 !important;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(15,23,42,0.8);
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  background: #0f172a !important;
+  color: white !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(
+      180deg,
+      #020617,
+      #0f172a
+  ) !important;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(59,130,246,0.15) !important;
+    transform: translateX(4px);
+    transition: all 0.25s ease;
+}
+
+.sidebar .nav-link.active {
+  background: linear-gradient(
+      90deg,
+      #2563eb,
+      #3b82f6
+  ) !important;
+
+  border-left: 4px solid #38bdf8;
+
+  box-shadow:
+      0 0 20px rgba(59,130,246,0.35);
+
+  color: white !important;
+}
+
+/* Sector Badge */
+.badge-sector {
+  background: rgba(59,130,246,0.2) !important;
+  color: #93c5fd !important;
+}
+
+/* Chart Container */
+canvas {
+  filter: brightness(1.1);
+}
+
+/* ===== TABLE FIXES ===== */
+
+.table,
+.table th,
+.table td {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+.table thead th {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+/* Portfolio Table Hover */
+
+.table tbody tr{
+    transition: all 0.25s ease;
+}
+
+.table tbody tr:hover{
+    background: rgba(59,130,246,0.08) !important;
+
+    transform: scale(1.005);
+
+    box-shadow: inset 0 0 15px rgba(59,130,246,0.08);
+}
+
+/* Cards */
+.card-body,
+.card-header {
+    color: #e2e8f0 !important;
+}
+
+/* Muted text */
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+/* Watchlist badges */
+.badge {
+    color: white !important;
+}
+
+/* Search page text */
+h1, h2, h3, h4, h5, h6 {
+    color: #f8fafc !important;
+}
+
+p,
+span,
+small,
+label {
+    color: #cbd5e1 !important;
+}
+
+/* Search box placeholder */
+input::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* For Bootstrap search inputs */
+.form-control::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* ===== Dark Modal Theme ===== */
+
+.modal-content {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+    border-radius: 12px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #334155 !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #334155 !important;
+}
+
+.modal-title {
+    color: #f8fafc !important;
+    font-weight: 600;
+}
+
+.modal-body label {
+    color: #cbd5e1 !important;
+}
+
+.modal-body p,
+.modal-body small {
+    color: #94a3b8 !important;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+.modal-content select,
+.modal-content input {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+.modal-content select:focus,
+.modal-content input:focus {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #3b82f6 !important;
+    box-shadow: none !important;
+}
+
+.card,
+.stat-card {
+  background: rgba(30,41,59,0.95) !important;
+  border: 1px solid rgba(59,130,246,0.15) !important;
+  color: var(--text-light) !important;
+
+  box-shadow:
+      0 8px 25px rgba(0,0,0,0.35),
+      0 0 20px rgba(59,130,246,0.08);
+
+  backdrop-filter: blur(12px);
+
+  transition: all 0.3s ease;
+}
+
+.card:hover,
+.stat-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.45),
+        0 0 25px rgba(59,130,246,0.18);
+}
+
+
+.sidebar .active {
+    background: linear-gradient(135deg,#2563eb,#06b6d4);
+    border-radius: 10px;
+}
+
+.topbar {
+    backdrop-filter: blur(10px);
+    background: rgba(15,23,42,0.8);
+}
+
+.search-input {
+    height: 52px;
+    border-radius: 12px;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 20px rgba(59,130,246,0.4);
+}
+
+.table tbody tr:hover {
+    background: rgba(59,130,246,0.08);
+    transition: 0.2s;
+}
+
+.badge {
+    border-radius: 50px;
+    padding: 6px 12px;
+}
+
+.card {
+    border-radius: 16px;
+}
+
+.card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+
+.card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 0 20px rgba(59,130,246,0.15);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 35px rgba(59,130,246,0.35);
+}
+
+.card {
+    backdrop-filter: blur(12px);
+    background: rgba(30,41,59,0.7);
+}
+
+.market-status{
+    background: #16a34a !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    box-shadow: 0 0 15px rgba(34,197,94,0.45);
+}
+
+/* Premium KPI Icons */
+
+.stat-icon{
+    width:56px;
+    height:56px;
+
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:1.4rem;
+
+    box-shadow:
+        0 0 20px rgba(59,130,246,0.15);
+}
+
+/* Blue */
+.stat-icon.bg-primary{
+    box-shadow:
+        0 0 25px rgba(59,130,246,0.35);
+}
+
+/* Cyan */
+.stat-icon.bg-info{
+    box-shadow:
+        0 0 25px rgba(6,182,212,0.35);
+}
+
+/* Green */
+.bg-gain-soft{
+    box-shadow:
+        0 0 25px rgba(34,197,94,0.35);
+}
+
+/* Gold */
+.stat-icon.bg-warning{
+    box-shadow:
+        0 0 25px rgba(234,179,8,0.35);
+}
+
+.sidebar .nav-link{
+    border-radius: 12px;
+    margin: 4px 10px;
+    transition: all 0.25s ease;
+}
+
+.sidebar .nav-link i{
+    transition: all 0.25s ease;
+}
+
+.sidebar .nav-link:hover i{
+    transform: scale(1.15);
+}
+
+.btn-buy{
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+    font-weight: 600;
+}
+
+.btn-sell{
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+    font-weight: 600;
+}
+
+.badge{
+    border-radius: 999px !important;
+    padding: 6px 12px !important;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.card-header{
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: white !important;
+}

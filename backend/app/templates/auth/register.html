@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Register - Stock Portfolio System{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="auth-logo"><i class="bi bi-graph-up-arrow text-primary"></i> StockFolio</div>
+      <p class="text-muted small mb-0">Create your free virtual trading account</p>
+    </div>
+
+    {% include 'partials/flash_messages.html' %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="full_name" class="form-control" value="{{ form_data.get('full_name', '') }}" placeholder="John Doe" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control" value="{{ form_data.get('email', '') }}" placeholder="john@example.com" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" value="{{ form_data.get('username', '') }}" placeholder="johndoe" required>
+        <div class="form-text">3-30 characters, letters/numbers/underscore only.</div>
+      </div>
+      <div class="row">
+        <div class="col-6 mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••" required>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-person-plus me-1"></i>Create Account
+      </button>
+    </form>
+
+    <p class="text-center mt-3 mb-0 small">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

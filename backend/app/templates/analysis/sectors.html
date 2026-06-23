@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Sector Analysis - Stock Portfolio System{% endblock %}
+{% block topbar_title %}Sector Analysis{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('analysis.index') }}" class="text-decoration-none small text-muted mb-2 d-inline-block">
+  <i class="bi bi-arrow-left"></i> Back to search
+</a>
+
+<div class="mb-3">
+  <h4 class="mb-0">Sector Analysis</h4>
+  <p class="text-muted small mb-0">Stocks grouped by industry sector.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header">Stock Count by Sector</div>
+      <div class="card-body" style="height: 300px;">
+        <canvas id="sectorCountChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Sector</th><th class="text-end">Number of Stocks</th></tr></thead>
+          <tbody>
+            {% for row in data.sector_counts %}
+            <tr>
+              <td>{{ row.sector_name }}</td>
+              <td class="text-end">{{ row.stock_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for sector_name, stocks in data.sector_stocks.items() %}
+<div class="card mb-3">
+  <div class="card-header">{{ sector_name }} <span class="badge bg-secondary ms-1">{{ stocks|length }}</span></div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-portfolio mb-0">
+        <thead><tr><th>Ticker</th><th>Company</th><th>Exchange</th><th class="text-end">Price</th><th></th></tr></thead>
+        <tbody>
+          {% for s in stocks %}
+          <tr>
+            <td><span class="ticker-badge">{{ s.ticker_symbol }}</span></td>
+            <td>{{ s.company_name }}</td>
+            <td>{{ s.exchange or 'N/A' }}</td>
+            <td class="text-end">₹{{ "%.2f"|format(s.last_price) }}</td>
+            <td class="text-end"><a href="{{ url_for('analysis.stock_detail', stock_id=s.stock_id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const labels = {{ data.sector_counts | map(attribute='sector_name') | list | tojson }};
+  const values = {{ data.sector_counts | map(attribute='stock_count') | list | tojson }};
+  renderSimpleBarChart("sectorCountChart", labels, values, "Stocks", "#0d9488");
+});
+</script>
+{% endblock %}

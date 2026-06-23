@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}{{ analysis.stock.ticker_symbol }} Analysis - Stock Portfolio System{% endblock %}
+{% block topbar_title %}Stock Analysis{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('analysis.index') }}" class="text-decoration-none small text-muted mb-2 d-inline-block">
+  <i class="bi bi-arrow-left"></i> Back to search
+</a>
+
+<div class="d-flex justify-content-between align-items-start flex-wrap mb-4">
+  <div>
+    <h3 class="mb-0">
+      <span class="ticker-badge">{{ analysis.stock.ticker_symbol }}</span>
+      <span class="badge badge-sector ms-2">{{ analysis.stock.sector_name or 'N/A' }}</span>
+    </h3>
+    <p class="text-muted mb-0">{{ analysis.company_info.longName }} &middot; {{ analysis.company_info.exchange }}</p>
+  </div>
+  <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-success" onclick="openTradeModal({{ analysis.stock.stock_id }}, '{{ analysis.stock.ticker_symbol }}', {{ analysis.current_price }}, 'buy')">
+      <i class="bi bi-cart-plus me-1"></i>Buy
+    </button>
+    <form method="POST" action="{{ url_for('watchlist.add') }}">
+      <input type="hidden" name="stock_id" value="{{ analysis.stock.stock_id }}">
+      <button type="submit" class="btn btn-outline-primary"><i class="bi bi-eye me-1"></i>Add to Watchlist</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-label">Current Price</div>
+      <div class="stat-value">₹{{ "%.2f"|format(analysis.current_price) }}</div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-label">Previous Close</div>
+      <div class="stat-value">{{ "%.2f"|format(analysis.company_info.previousClose) if analysis.company_info.previousClose else 'N/A' }}</div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-label">Day High / Low</div>
+      <div class="stat-value fs-6">
+        {{ "%.2f"|format(analysis.company_info.dayHigh) if analysis.company_info.dayHigh else 'N/A' }} /
+        {{ "%.2f"|format(analysis.company_info.dayLow) if analysis.company_info.dayLow else 'N/A' }}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-label">52-Week High / Low</div>
+      <div class="stat-value fs-6">
+        {{ "%.2f"|format(analysis.company_info.fiftyTwoWeekHigh) if analysis.company_info.fiftyTwoWeekHigh else 'N/A' }} /
+        {{ "%.2f"|format(analysis.company_info.fiftyTwoWeekLow) if analysis.company_info.fiftyTwoWeekLow else 'N/A' }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Price Chart -->
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Price History</span>
+    <div class="btn-group btn-group-sm" role="group">
+      <button class="btn btn-outline-secondary chart-period-btn active" data-period="1m">1M</button>
+      <button class="btn btn-outline-secondary chart-period-btn" data-period="3m">3M</button>
+      <button class="btn btn-outline-secondary chart-period-btn" data-period="6m">6M</button>
+    </div>  
+  </div>
+  <div class="card-body" style="height: 360px;">
+    <canvas id="priceChart"></canvas>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Company Overview</div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tr><td class="text-muted">Industry</td><td>{{ analysis.company_info.industry }}</td></tr>
+          <tr><td class="text-muted">Sector</td><td>{{ analysis.company_info.sector }}</td></tr>
+          <tr><td class="text-muted">Market Cap</td><td>{{ "{:,}".format(analysis.company_info.marketCap) if analysis.company_info.marketCap else 'N/A' }}</td></tr>
+          <tr><td class="text-muted">P/E Ratio</td><td>{{ "%.2f"|format(analysis.company_info.trailingPE) if analysis.company_info.trailingPE else 'N/A' }}</td></tr>
+          <tr><td class="text-muted">Dividend Yield</td><td>{{ "%.2f"|format(analysis.company_info.dividendYield) + '%' if analysis.company_info.dividendYield else 'N/A' }}</td></tr>
+          <tr><td class="text-muted">Volume</td><td>{{ "{:,}".format(analysis.company_info.volume) if analysis.company_info.volume else 'N/A' }}</td></tr>
+          <tr><td class="text-muted">Currency</td><td>{{ analysis.company_info.currency }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">About {{ analysis.company_info.longName }}</div>
+      <div class="card-body">
+        <p class="small text-muted mb-0" style="max-height: 220px; overflow-y: auto;">
+          {{ analysis.company_info.longBusinessSummary }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'partials/trade_modal.html' %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const TICKER = "{{ analysis.stock.ticker_symbol }}";
+let priceChartInstance = null;
+
+function loadChart(period) {
+  fetch(`/analysis/api/chart/${TICKER}?period=${period}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (priceChartInstance) priceChartInstance.destroy();
+      priceChartInstance = renderStockPriceChart("priceChart", data.labels, data.prices, TICKER);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadChart("1m");
+
+  document.querySelectorAll(".chart-period-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".chart-period-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadChart(btn.dataset.period);
+    });
+  });
+});
+</script>
+{% endblock %}

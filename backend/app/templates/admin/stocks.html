@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Manage Stocks - Admin{% endblock %}
+{% block topbar_title %}Manage Stocks{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Manage Stocks</h4>
+    <p class="text-muted small mb-0">Add new stocks (validated against live market data) or edit existing listings.</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+    <i class="bi bi-plus-lg me-1"></i>Add Stock
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-portfolio mb-0">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Company</th>
+            <th>Sector</th>
+            <th>Exchange</th>
+            <th class="text-end">Price</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in stocks %}
+          <tr>
+            <td><span class="ticker-badge">{{ s.ticker_symbol }}</span></td>
+            <td>{{ s.company_name }}</td>
+            <td><span class="badge badge-sector">{{ s.sector_name or 'N/A' }}</span></td>
+            <td>{{ s.exchange or 'N/A' }}</td>
+            <td class="text-end">₹{{ "%.2f"|format(s.last_price) }}</td>
+            <td>
+              {% if s.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+            </td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editStockModal{{ s.stock_id }}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <form method="POST" action="{{ url_for('admin.delete_stock', stock_id=s.stock_id) }}" class="d-inline" onsubmit="return confirm('Delete this stock? This will fail if users currently hold it.');">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+
+          <!-- Edit Modal for this stock -->
+          <div class="modal fade" id="editStockModal{{ s.stock_id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Edit {{ s.ticker_symbol }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ url_for('admin.edit_stock', stock_id=s.stock_id) }}">
+                  <div class="modal-body">
+                    <div class="mb-2">
+                      <label class="form-label">Company Name</label>
+                      <input type="text" name="company_name" class="form-control" value="{{ s.company_name }}" required>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">Sector</label>
+                      <select name="sector_id" class="form-select">
+                        <option value="">— None —</option>
+                        {% for sec in sectors %}
+                          <option value="{{ sec.sector_id }}" {{ 'selected' if sec.sector_id == s.sector_id else '' }}>{{ sec.sector_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 mb-2">
+                        <label class="form-label">Exchange</label>
+                        <input type="text" name="exchange" class="form-control" value="{{ s.exchange or '' }}">
+                      </div>
+                      <div class="col-6 mb-2">
+                        <label class="form-label">Currency</label>
+                        <input type="text" name="currency" class="form-control" value="{{ s.currency or 'USD' }}">
+                      </div>
+                    </div>
+                    <div class="form-check mt-2">
+                      <input type="checkbox" class="form-check-input" name="is_active" value="1" id="active{{ s.stock_id }}" {{ 'checked' if s.is_active else '' }}>
+                      <label class="form-check-label" for="active{{ s.stock_id }}">Active (visible to users)</label>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No stocks listed yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Stock</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('admin.add_stock') }}">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Ticker Symbol</label>
+            <input type="text" name="ticker_symbol" class="form-control" placeholder="e.g. AAPL, TCS.NS" required>
+            <div class="form-text">Must be a valid yfinance ticker — it will be validated against live market data.</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Company Name</label>
+            <input type="text" name="company_name" class="form-control" placeholder="e.g. Apple Inc." required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Sector</label>
+            <select name="sector_id" class="form-select">
+              <option value="">— None —</option>
+              {% for sec in sectors %}
+                <option value="{{ sec.sector_id }}">{{ sec.sector_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-2">
+              <label class="form-label">Exchange</label>
+              <input type="text" name="exchange" class="form-control" placeholder="NASDAQ / NSE">
+            </div>
+            <div class="col-6 mb-2">
+              <label class="form-label">Currency</label>
+              <input type="text" name="currency" class="form-control" value="USD">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

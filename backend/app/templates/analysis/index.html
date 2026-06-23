@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Stock Analysis - Stock Portfolio System{% endblock %}
+{% block topbar_title %}Stock Analysis{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h4 class="mb-0">Stock Analysis</h4>
+  <p class="text-muted small mb-0">Search any stock to view company info, live price, and historical charts.</p>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" action="{{ url_for('analysis.index') }}" class="row g-2">
+      <div class="col-md-9">
+        <input type="text" name="q" class="form-control" placeholder="Search by ticker symbol or company name (e.g. AAPL, Tesla, Infosys)" value="{{ search_term }}">
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <span class="text-muted small">{{ results|length }} result(s) {% if search_term %}for "{{ search_term }}"{% endif %}</span>
+  <a href="{{ url_for('analysis.sectors') }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-pie-chart me-1"></i>Sector Analysis
+  </a>
+</div>
+
+<div class="row g-3">
+  {% for stock in results %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="ticker-badge fs-5">{{ stock.ticker_symbol }}</span>
+            <div class="small text-muted">{{ stock.company_name }}</div>
+          </div>
+          <span class="badge badge-sector">{{ stock.sector_name or 'N/A' }}</span>
+        </div>
+        <div class="mt-3 fs-5 fw-bold">₹{{ "%.2f"|format(stock.last_price) }}</div>
+        <a href="{{ url_for('analysis.stock_detail', stock_id=stock.stock_id) }}" class="btn btn-sm btn-primary mt-2 w-100">
+          View Analysis
+        </a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+    {% if search_term %}
+      <div class="col-12">
+        <div class="text-center text-muted py-5">No stocks found matching "{{ search_term }}".</div>
+      </div>
+    {% else %}
+      <div class="col-12">
+        <div class="text-center text-muted py-5">Enter a search term above to find stocks to analyze.</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Reports - Admin{% endblock %}
+{% block topbar_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Platform Reports</h4>
+    <p class="text-muted small mb-0">Aggregate statistics for the entire platform.</p>
+  </div>
+  <button class="btn btn-outline-secondary" onclick="window.print()">
+    <i class="bi bi-printer me-1"></i>Print Report
+  </button>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Total Registered Users</div>
+      <div class="stat-value">{{ report.total_users }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Total Stocks Listed</div>
+      <div class="stat-value">{{ report.total_stocks }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-label">Total Transactions</div>
+      <div class="stat-value">{{ report.total_transactions }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">Daily Transaction Volume (Last 30 Days)</div>
+      <div class="card-body" style="height: 320px;">
+        <canvas id="reportVolumeChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Sector Distribution</div>
+      <div class="card-body" style="height: 320px;">
+        <canvas id="reportSectorChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">Sector-wise Stock Count (Table)</div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Sector</th><th class="text-end">Stocks</th></tr></thead>
+      <tbody>
+        {% for row in report.sector_distribution %}
+        <tr><td>{{ row.sector_name }}</td><td class="text-end">{{ row.stock_count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("{{ url_for('admin.api_report_data') }}")
+    .then((res) => res.json())
+    .then((data) => {
+      renderSimpleBarChart(
+        "reportVolumeChart",
+        data.txn_volume_by_day.map((r) => r.day),
+        data.txn_volume_by_day.map((r) => r.volume),
+        "Volume (₹)",
+        "#0d9488"
+      );
+      renderSimpleBarChart(
+        "reportSectorChart",
+        data.sector_distribution.map((r) => r.sector_name),
+        data.sector_distribution.map((r) => r.stock_count),
+        "Stocks",
+        "#c9a227"
+      );
+    });
+});
+</script>
+{% endblock %}

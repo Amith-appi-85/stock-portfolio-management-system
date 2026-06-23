@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Stock Portfolio System{% endblock %}</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% if session.get('user_id') %}
+  {% include 'partials/sidebar.html' %}
+{% endif %}
+
+<div class="{% if session.get('user_id') %}main-content{% endif %}">
+  {% if session.get('user_id') %}
+    {% include 'partials/topbar.html' %}
+  {% endif %}
+
+  <div class="{% if session.get('user_id') %}page-body{% endif %}">
+    {% include 'partials/flash_messages.html' %}
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/trading.js') }}"></script>
+
+{% block extra_scripts %}{% endblock %}
+
+</div>
+
+{% if session.get('user_id') %}
+</div>
+{% endif %}
+
+</body>
+</html>

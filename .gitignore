@@ -1,0 +1,24 @@
+# Environment & secrets
+backend/.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+*.egg-info/
+
+# Flask
+instance/
+.flaskenv
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log

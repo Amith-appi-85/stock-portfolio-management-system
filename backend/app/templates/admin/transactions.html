@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Transactions - Admin{% endblock %}
+{% block topbar_title %}All Transactions{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h4 class="mb-0">All Transactions</h4>
+  <p class="text-muted small mb-0">Complete ledger of every BUY/SELL across all users (most recent 200).</p>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-portfolio mb-0">
+        <thead>
+          <tr>
+            <th>Txn ID</th>
+            <th>User</th>
+            <th>Stock</th>
+            <th>Type</th>
+            <th class="text-end">Qty</th>
+            <th class="text-end">Price/Share</th>
+            <th class="text-end">Total</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in transactions %}
+          <tr>
+            <td>{{ t.transaction_id }}</td>
+            <td>{{ t.username }}</td>
+            <td><span class="ticker-badge">{{ t.ticker_symbol }}</span></td>
+            <td>
+              <span class="badge {{ 'bg-success' if t.transaction_type == 'BUY' else 'bg-danger' }}">{{ t.transaction_type }}</span>
+            </td>
+            <td class="text-end">{{ t.quantity }}</td>
+            <td class="text-end">₹{{ "%.2f"|format(t.price_per_share) }}</td>
+            <td class="text-end">₹{{ "%.2f"|format(t.total_amount) }}</td>
+            <td class="small text-muted">{{ t.transaction_date.strftime('%d %b %Y, %I:%M %p') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="text-center text-muted py-4">No transactions recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

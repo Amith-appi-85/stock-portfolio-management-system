@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Stock Portfolio System{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Welcome back, {{ session.get('full_name') }}</h4>
+    <p class="text-muted small mb-0">Here's how your virtual portfolio is performing.</p>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card d-flex justify-content-between align-items-start">
+      <div>
+        <div class="stat-label">Total Investment</div>
+        <div class="stat-value">₹{{ "%.2f"|format(data.total_investment) }}</div>
+      </div>
+      <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-wallet2"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card d-flex justify-content-between align-items-start">
+      <div>
+        <div class="stat-label">Current Value</div>
+        <div class="stat-value">₹{{ "%.2f"|format(data.current_value) }}</div>
+      </div>
+      <div class="stat-icon bg-info bg-opacity-10 text-info"><i class="bi bi-graph-up"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card d-flex justify-content-between align-items-start">
+      <div>
+        <div class="stat-label">Profit / Loss</div>
+        <div class="stat-value {{ 'text-gain' if data.total_profit_loss >= 0 else 'text-loss' }}">
+          {{ '+' if data.total_profit_loss >= 0 else '' }}₹{{ "%.2f"|format(data.total_profit_loss) }}
+        </div>
+        <div class="small {{ 'text-gain' if data.profit_loss_percent >= 0 else 'text-loss' }}">
+          ({{ data.profit_loss_percent }}%)
+        </div>
+      </div>
+      <div class="stat-icon {{ 'bg-gain-soft text-gain' if data.total_profit_loss >= 0 else 'bg-loss-soft text-loss' }}">
+        <i class="bi {{ 'bi-arrow-up-right' if data.total_profit_loss >= 0 else 'bi-arrow-down-right' }}"></i>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card d-flex justify-content-between align-items-start">
+      <div>
+        <div class="stat-label">Virtual Cash Balance</div>
+        <div class="stat-value">₹{{ "%.2f"|format(data.virtual_balance) }}</div>
+      </div>
+      <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-cash-coin"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Best / Worst Performer -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-trophy text-gain"></i> Top Performing Stock
+      </div>
+      <div class="card-body">
+        {% if data.best_performer %}
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="ticker-badge fs-5">{{ data.best_performer.ticker_symbol }}</span>
+              <div class="text-muted small">{{ data.best_performer.company_name }}</div>
+            </div>
+            <div class="text-end">
+              <div class="text-gain fw-bold">+{{ data.best_performer.profit_loss_percent }}%</div>
+              <div class="small text-muted">₹{{ "%.2f"|format(data.best_performer.profit_loss) }}</div>
+            </div>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No holdings yet. <a href="{{ url_for('portfolio.index') }}">Start trading</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-graph-down text-loss"></i> Worst Performing Stock
+      </div>
+      <div class="card-body">
+        {% if data.worst_performer %}
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="ticker-badge fs-5">{{ data.worst_performer.ticker_symbol }}</span>
+              <div class="text-muted small">{{ data.worst_performer.company_name }}</div>
+            </div>
+            <div class="text-end">
+              <div class="text-loss fw-bold">{{ data.worst_performer.profit_loss_percent }}%</div>
+              <div class="small text-muted">₹{{ "%.2f"|format(data.worst_performer.profit_loss) }}</div>
+            </div>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No holdings yet. <a href="{{ url_for('portfolio.index') }}">Start trading</a>.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header">Portfolio Allocation by Sector</div>
+      <div class="card-body" style="height: 320px;">
+        <canvas id="allocationChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header">Monthly Investment Trend</div>
+      <div class="card-body" style="height: 320px;">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("{{ url_for('dashboard.chart_data') }}")
+    .then((res) => res.json())
+    .then((data) => {
+      renderAllocationPieChart("allocationChart", data.sector_allocation.labels, data.sector_allocation.values);
+      renderInvestmentTrendChart("trendChart", data.investment_trend.labels, data.investment_trend.bought, data.investment_trend.sold);
+    });
+});
+</script>
+{% endblock %}
